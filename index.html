@@ -1,0 +1,695 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>FOROS HOSTING | Business Admin Panel</title>
+  <meta name="description" content="Manage business articles, website content and SEO metadata.">
+  <meta name="robots" content="noindex,nofollow">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f6fb;
+      color: #172033;
+    }
+
+    header {
+      background: #132744;
+      color: white;
+      padding: 24px 16px;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 24px auto;
+      padding: 0 15px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 18px;
+      border-radius: 14px;
+      border: 1px solid #dce4ef;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 14px 0 6px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    button {
+      background: #175cd3;
+      color: white;
+      padding: 11px 16px;
+      border: 0;
+      border-radius: 8px;
+      margin: 10px 6px 0 0;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button.secondary {
+      background: #e5eaf2;
+      color: #172033;
+    }
+
+    button.delete {
+      background: #b42318;
+    }
+
+    button:disabled {
+      opacity: .6;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .status {
+      background: #edf3ff;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .post {
+      border: 1px solid #dce4ef;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 12px;
+    }
+
+    .post h3 {
+      margin-top: 0;
+    }
+
+    .muted {
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #64748b;
+    }
+
+    @media (max-width: 600px) {
+      main {
+        margin-top: 15px;
+      }
+
+      .card {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>FOROS HOSTING</h1>
+  <p>Business Website · Admin Panel · SEO Manager</p>
+</header>
+
+<main>
+
+  <!-- ADMIN LOGIN -->
+  <section class="card" id="loginCard">
+    <h2>Admin Login</h2>
+    <p class="muted">
+      Sign in using the administrator account created in Firebase Authentication.
+    </p>
+
+    <form id="loginForm">
+      <label for="email">Admin Email</label>
+      <input
+        id="email"
+        type="email"
+        autocomplete="username"
+        required
+      >
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        required
+      >
+
+      <button type="submit" id="loginBtn">
+        Sign In
+      </button>
+    </form>
+
+    <div class="status" id="loginStatus">
+      Please sign in.
+    </div>
+  </section>
+
+  <!-- POST EDITOR -->
+  <section class="card hidden" id="adminCard">
+    <h2 id="formHeading">Create Business Post</h2>
+
+    <form id="postForm">
+
+      <input type="hidden" id="postId">
+
+      <label for="title">Post Title *</label>
+      <input
+        id="title"
+        maxlength="160"
+        required
+        placeholder="Enter your business post title"
+      >
+
+      <label for="slug">SEO URL Slug</label>
+      <input
+        id="slug"
+        maxlength="180"
+        placeholder="example-business-news"
+      >
+
+      <label for="excerpt">Short Description</label>
+      <textarea
+        id="excerpt"
+        maxlength="300"
+        placeholder="Write a short summary of your post"
+      ></textarea>
+
+      <label for="content">Full Post Content *</label>
+      <textarea
+        id="content"
+        required
+        placeholder="Write your business article here..."
+      ></textarea>
+
+      <label for="imageUrl">Featured Image URL</label>
+      <input
+        id="imageUrl"
+        type="url"
+        placeholder="https://example.com/image.jpg"
+      >
+
+      <label for="seoTitle">SEO Title</label>
+      <input
+        id="seoTitle"
+        maxlength="60"
+        placeholder="Search-friendly page title"
+      >
+
+      <label for="seoDescription">Meta Description</label>
+      <textarea
+        id="seoDescription"
+        maxlength="160"
+        placeholder="Summarize this page for search results"
+      ></textarea>
+
+      <label for="keywords">SEO Keywords</label>
+      <input
+        id="keywords"
+        placeholder="business, services, products"
+      >
+
+      <button type="submit" id="saveBtn">
+        Save Post
+      </button>
+
+      <button type="button" class="secondary" id="resetBtn">
+        Clear Form
+      </button>
+
+      <button type="button" class="secondary" id="logoutBtn">
+        Sign Out
+      </button>
+
+    </form>
+
+    <div class="status" id="adminStatus">
+      Admin panel ready.
+    </div>
+  </section>
+
+  <!-- POSTS LIST -->
+  <section class="card hidden" id="postsCard">
+    <h2>Manage Published Posts</h2>
+
+    <label for="search">Search Posts</label>
+    <input
+      id="search"
+      type="search"
+      placeholder="Search by title, content or keywords"
+    >
+
+    <div id="postsList"></div>
+  </section>
+
+  <section class="card">
+    <h2>Setup Instructions</h2>
+    <ol>
+      <li>Open Firebase Console.</li>
+      <li>Select your FOROS HOSTING project.</li>
+      <li>Enable Email/Password in Authentication.</li>
+      <li>Create a Firestore Database.</li>
+      <li>Create your administrator account.</li>
+      <li>Configure secure Firestore rules.</li>
+      <li>Deploy this website using Firebase Hosting.</li>
+    </ol>
+
+    <p class="muted">
+      This file is the admin panel. To make posts publicly visible
+      and eligible for Google indexing, create a separate public
+      article page for each post and submit a sitemap through
+      Google Search Console.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  FOROS HOSTING · Business Website
+</footer>
+
+<script type="module">
+
+  import {
+    initializeApp
+  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    doc,
+    updateDoc,
+    deleteDoc,
+    query,
+    orderBy,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+
+  // YOUR FIREBASE CONFIGURATION
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAQMaXJtAgkJ91ktAEfF4pAanK-O1-DN-g",
+    authDomain: "foros-hosting-3beab.firebaseapp.com",
+    projectId: "foros-hosting-3beab",
+    storageBucket: "foros-hosting-3beab.firebasestorage.app",
+    messagingSenderId: "657109461918",
+    appId: "1:657109461918:web:c5beb3ad5041ec94d3848f"
+  };
+
+
+  // INITIALIZE FIREBASE
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const $ = id => document.getElementById(id);
+
+  let currentUser = null;
+  let posts = [];
+
+
+  // SAFE SLUG GENERATOR
+
+  function makeSlug(text) {
+    return text
+      .toLowerCase()
+      .trim()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 180);
+  }
+
+
+  // LOGIN
+
+  $("loginForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    $("loginBtn").disabled = true;
+    $("loginStatus").textContent = "Signing in...";
+
+    try {
+      await signInWithEmailAndPassword(
+        auth,
+        $("email").value.trim(),
+        $("password").value
+      );
+    } catch (error) {
+      $("loginStatus").textContent =
+        "Login failed: " + error.message;
+    } finally {
+      $("loginBtn").disabled = false;
+    }
+  });
+
+
+  // AUTH STATE
+
+  onAuthStateChanged(auth, async user => {
+    currentUser = user;
+
+    $("loginCard").classList.toggle("hidden", !!user);
+    $("adminCard").classList.toggle("hidden", !user);
+    $("postsCard").classList.toggle("hidden", !user);
+
+    if (user) {
+      $("adminStatus").textContent =
+        "Signed in as " + user.email;
+
+      await loadPosts();
+    } else {
+      posts = [];
+      renderPosts();
+      $("loginStatus").textContent = "Please sign in.";
+    }
+  });
+
+
+  // AUTO-GENERATE SLUG AND SEO TITLE
+
+  $("title").addEventListener("input", () => {
+    if (!$("slug").dataset.edited) {
+      $("slug").value = makeSlug($("title").value);
+    }
+
+    if (!$("seoTitle").value) {
+      $("seoTitle").value = $("title").value.slice(0, 60);
+    }
+  });
+
+  $("slug").addEventListener("input", () => {
+    $("slug").dataset.edited = "1";
+  });
+
+
+  // RESET FORM
+
+  function resetForm() {
+    $("postForm").reset();
+    $("postId").value = "";
+    $("slug").dataset.edited = "";
+    $("formHeading").textContent = "Create Business Post";
+    $("saveBtn").textContent = "Save Post";
+  }
+
+  $("resetBtn").addEventListener("click", resetForm);
+
+
+  // SIGN OUT
+
+  $("logoutBtn").addEventListener("click", async () => {
+    try {
+      await signOut(auth);
+      resetForm();
+    } catch (error) {
+      $("adminStatus").textContent = error.message;
+    }
+  });
+
+
+  // CREATE OR UPDATE POST
+
+  $("postForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    if (!currentUser) {
+      $("adminStatus").textContent = "Please sign in first.";
+      return;
+    }
+
+    const title = $("title").value.trim();
+    const content = $("content").value.trim();
+
+    if (!title || !content) {
+      $("adminStatus").textContent =
+        "Title and content are required.";
+      return;
+    }
+
+    const data = {
+      title: title,
+
+      slug: makeSlug(
+        $("slug").value || title
+      ),
+
+      excerpt: $("excerpt").value.trim(),
+
+      content: content,
+
+      imageUrl: $("imageUrl").value.trim(),
+
+      seoTitle:
+        $("seoTitle").value.trim() ||
+        title.slice(0, 60),
+
+      seoDescription:
+        $("seoDescription").value.trim() ||
+        $("excerpt").value.trim().slice(0, 160),
+
+      keywords: $("keywords").value
+        .split(",")
+        .map(word => word.trim())
+        .filter(Boolean)
+        .slice(0, 20),
+
+      updatedAt: serverTimestamp(),
+
+      updatedBy: currentUser.uid
+    };
+
+    $("saveBtn").disabled = true;
+
+    try {
+      const postId = $("postId").value;
+
+      if (postId) {
+        await updateDoc(
+          doc(db, "posts", postId),
+          data
+        );
+
+        $("adminStatus").textContent =
+          "Post updated successfully.";
+
+      } else {
+        await addDoc(
+          collection(db, "posts"),
+          {
+            ...data,
+            createdAt: serverTimestamp(),
+            createdBy: currentUser.uid
+          }
+        );
+
+        $("adminStatus").textContent =
+          "Post saved successfully.";
+      }
+
+      resetForm();
+      await loadPosts();
+
+    } catch (error) {
+      $("adminStatus").textContent =
+        "Save failed: " + error.message +
+        ". Check Firestore setup and security rules.";
+
+    } finally {
+      $("saveBtn").disabled = false;
+    }
+  });
+
+
+  // LOAD POSTS FROM FIRESTORE
+
+  async function loadPosts() {
+    try {
+      const result = await getDocs(
+        query(
+          collection(db, "posts"),
+          orderBy("createdAt", "desc")
+        )
+      );
+
+      posts = result.docs.map(item => ({
+        id: item.id,
+        ...item.data()
+      }));
+
+      renderPosts();
+
+      $("adminStatus").textContent =
+        "Loaded " + posts.length + " post(s).";
+
+    } catch (error) {
+      $("adminStatus").textContent =
+        "Could not load posts: " + error.message;
+    }
+  }
+
+
+  // SEARCH AND DISPLAY POSTS
+
+  function renderPosts() {
+    const term = $("search").value.toLowerCase().trim();
+    const container = $("postsList");
+
+    container.replaceChildren();
+
+    const results = posts.filter(post => {
+      const text = [
+        post.title,
+        post.content,
+        post.excerpt,
+        ...(post.keywords || [])
+      ].join(" ").toLowerCase();
+
+      return text.includes(term);
+    });
+
+    if (!results.length) {
+      container.textContent = "No posts found.";
+      return;
+    }
+
+    results.forEach(post => {
+      const box = document.createElement("article");
+      box.className = "post";
+
+      const title = document.createElement("h3");
+      title.textContent = post.title || "Untitled";
+
+      const excerpt = document.createElement("p");
+      excerpt.textContent = post.excerpt || "";
+
+      const slug = document.createElement("p");
+      slug.className = "muted";
+      slug.textContent = "URL slug: " + (post.slug || "");
+
+      box.append(title, excerpt, slug);
+
+      if (post.imageUrl) {
+        const image = document.createElement("img");
+        image.src = post.imageUrl;
+        image.alt = post.title || "Post image";
+        image.loading = "lazy";
+        image.style.maxWidth = "160px";
+        image.style.maxHeight = "100px";
+        box.append(image);
+      }
+
+      const edit = document.createElement("button");
+      edit.textContent = "Edit";
+      edit.className = "secondary";
+
+      edit.addEventListener("click", () => {
+        $("postId").value = post.id;
+
+        $("title").value = post.title || "";
+        $("slug").value = post.slug || "";
+        $("excerpt").value = post.excerpt || "";
+        $("content").value = post.content || "";
+        $("imageUrl").value = post.imageUrl || "";
+        $("seoTitle").value = post.seoTitle || "";
+        $("seoDescription").value =
+          post.seoDescription || "";
+
+        $("keywords").value =
+          (post.keywords || []).join(", ");
+
+        $("slug").dataset.edited = "1";
+
+        $("formHeading").textContent = "Edit Business Post";
+        $("saveBtn").textContent = "Update Post";
+
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
+      });
+
+      const remove = document.createElement("button");
+      remove.textContent = "Delete";
+      remove.className = "delete";
+
+      remove.addEventListener("click", async () => {
+        if (!confirm("Permanently delete this post?")) {
+          return;
+        }
+
+        try {
+          await deleteDoc(
+            doc(db, "posts", post.id)
+          );
+
+          $("adminStatus").textContent =
+            "Post deleted successfully.";
+
+          await loadPosts();
+
+        } catch (error) {
+          $("adminStatus").textContent =
+            "Delete failed: " + error.message;
+        }
+      });
+
+      box.append(edit, remove);
+      container.append(box);
+    });
+  }
+
+  $("search").addEventListener("input", renderPosts);
+
+</script>
+
+</body>
+</html>
